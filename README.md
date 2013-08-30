@@ -14,6 +14,8 @@ A useful tools or tips list for mobile web application developing
  
  [几乎所有设备的屏幕尺寸与像素密度表](http://en.wikipedia.org/wiki/List_of_displays_by_pixel_density "几乎所有设备的屏幕尺寸与像素密度表")
  
+ [移动设备参数表](http://screensiz.es/phone "移动设备参数表")
+ 
  [ios端移动设备参数速查](http://ivomynttinen.com/blog/the-ios-design-cheat-sheet-volume-2/ "ios端移动设备参数速查")
  
  [浏览器兼容表](http://www.quirksmode.org/compatibility.html "浏览器兼容表")
@@ -792,6 +794,8 @@ demo： <http://maplejan.sinaapp.com/demo/fixed_chromemobile.html>
  [zepto的一篇使用注意点讲解](http://chaoskeh.com/blog/some-experience-of-using-zepto.html "zepto")
  
  [zepto的著名的tap“点透”bug](http://blog.youyo.name/archives/zepto-tap-click-through-research.html "zepto")
+ 
+ [zepto源码注释](http://www.cnblogs.com/sky000/archive/2013/03/29/2988952.html "zepto")
 
 #iscroll4
 
@@ -833,5 +837,68 @@ iscroll的闪动问题也与渲染有关系，可以参考
 
 
 
+##移动端字体问题(待补充)
 
+<http://zhuanlan.zhihu.com/zhezhexiong/19565895>
+<http://www.sencha.com/blog/resolution-independent-mobile-ui>
+<http://stackoverflow.com/questions/12058574/pixel-density-retina-display-and-font-size-in-css>
+
+<http://bjango.com/articles/min-device-pixel-ratio/>各种ratio
+
+
+##跨域问题
+
+手机浏览器也是浏览器，在ajax调用外部api的时候也存在跨域问题。当然利用phonegap打包后，由于协议不一样就不存在跨域问题了。
+但页面通常是需要跟后端进行调试的。一般会报类似
+
+	XMLHttpRequest cannot load XXX
+	Origin null is not allowed by Access-Control-Allow-Origin.
+
+以及
+
+	XMLHttpRequest cannot load http://. Request header field Content-Type is not allowed by Access-Control-Allow-Headers."
+
+
+
+这时候可以让后端加上两个http头
+
+	Access-Control-Allow-Origin "*"
+	Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept"
+
+第一个头可以避免跨域问题，第二个头可以方便ajax请求设置content-type等配置项
+
+
+##phonegap部分
+
+#Should not happen: no rect-based-test nodes found 
+在android项目中的assets中的html页面中加入以下代码，便可解决问题
+
+	window,html,body{
+	    overflow-x:hidden !important;
+	    -webkit-overflow-scrolling: touch !important;
+	    overflow: scroll !important;
+	}
+	
+参考：
+
+<http://stackoverflow.com/questions/12090899/android-webview-jellybean-should-not-happen-no-rect-based-test-nodes-found>
+
+#拿联系人的时候报ContactFindOptions is not defined
+
+出现这个问题可能是因为navigator取contacts时绑定的window.onload
+
+注意使用phonegap的api时，一定要在devicereay事件的处理函数中使用api
+
+	document.addEventListener("deviceready", onDeviceReady, false);
+	
+	    function onDeviceReady() {    
+	        callFetchContacts();
+	    }
+	
+	function callFetchContacts(){
+	    var options = new ContactFindOptions();
+	    options.multiple = true;
+	    var fields       = ["displayName", "name","phoneNumbers"];
+	    navigator.contacts.find(fields, onSuccess, onError,options);  
+	    }
 
